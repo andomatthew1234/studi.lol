@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Publish - visualiser.lol</title>
-    <!-- Dynamic GH Favicon -->
     <link rel="icon" type="image/png" href="/gh_favicon.png">
     
-    <!-- Toast UI Editor Styles for Rich Text -->
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/theme/toastui-editor-dark.min.css" />
     <link rel="stylesheet" href="style.css">
@@ -48,13 +46,9 @@
             </nav>
         </aside>
 
-        <!-- Main Content Area -->
         <main class="gh-content">
-            
             <!-- View: Account -->
             <section id="view-account" class="view-section active">
-                
-                <!-- State 1: Logged Out Splash -->
                 <div id="account-splash-state" class="card center-splash">
                     <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor" style="margin-bottom: 1rem;"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
                     <h2>Sign in with GitHub to continue</h2>
@@ -62,7 +56,6 @@
                     <button id="btn-start-signin" class="primary-btn" style="margin-top: 2rem; width: auto;">Sign In</button>
                 </div>
 
-                <!-- State 2: Tutorial Wizard -->
                 <div id="account-wizard-state" style="display: none;">
                     <div class="content-header">
                         <h2>Setup GitHub Access</h2>
@@ -78,7 +71,6 @@
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                                 <span>You may need to re-sign into GitHub for security reasons.</span>
                             </div>
-                            <img src="/gh/step_img/1.png" alt="GitHub login screen" class="step-img">
                         </div>
                         <div class="wizard-step" id="step-2">
                             <h3>Step 2: Give it a name</h3>
@@ -87,7 +79,6 @@
                                 <input type="text" id="copy-note-text" value="visualiser.lol PAT" readonly>
                                 <button class="outline-btn small-btn copy-action" data-target="copy-note-text">Copy</button>
                             </div>
-                            <img src="/gh/step_img/2.png" alt="Note field screenshot" class="step-img">
                         </div>
                         <div class="wizard-step" id="step-3">
                             <h3>Step 3: Add permissions</h3>
@@ -95,16 +86,10 @@
                             <ul class="permission-list">
                                 <li>repo</li><li>write:packages</li><li>gist</li><li>user</li><li>project</li><li>delete_repo</li>
                             </ul>
-                            <div class="warning-box">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                                <span>Functions will not work as expected if you do not add these permissions. Or, as shown highlighted in the red circle in the example below.</span>
-                            </div>
-                            <img src="/gh/step_img/3.png" alt="Permissions screenshot" class="step-img">
                         </div>
                         <div class="wizard-step" id="step-4">
                             <h3>Step 4: Press create</h3>
                             <p>Scroll to the bottom and select the big green button to create your PAT!</p>
-                            <img src="/gh/step_img/4.png" alt="Create button screenshot" class="step-img">
                         </div>
                         <div class="wizard-step" id="step-5">
                             <h3>Step 5: Copy your PAT!</h3>
@@ -126,7 +111,6 @@
                     </div>
                 </div>
 
-                <!-- State 3: Logged In Dashboard -->
                 <div id="account-dashboard-state" style="display: none;">
                     <div class="content-header" style="display:flex; justify-content:space-between; align-items:center;">
                         <div>
@@ -216,32 +200,48 @@
 
             <!-- View: Repository Publishing -->
             <section id="view-repo" class="view-section" style="max-width: 900px;">
+                <!-- Initial Prompt -->
                 <div id="repo-prompt-state" class="card repo-center-card">
                     <svg class="alert-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                    <h3>Create a repository?</h3>
-                    <p>A repo has not been created for this project yet. Create one now?</p>
-                    <div style="display:flex; gap:1rem; margin-top:1.5rem;">
-                        <button id="btn-show-create" class="primary-btn">Create one</button>
-                        <button class="outline-btn" onclick="document.querySelector('[data-target=\'view-account\']').click()">Cancel</button>
+                    <h3>No linked repository</h3>
+                    <p>This project is not linked to a GitHub repository yet.</p>
+                    <div style="display:flex; gap:1rem; margin-top:1.5rem; flex-wrap:wrap; justify-content:center;">
+                        <button id="btn-show-create" class="primary-btn" style="width:auto;">Create new repo</button>
+                        <button id="btn-show-link" class="outline-btn">Link existing repo</button>
                     </div>
                 </div>
 
+                <!-- Create Repo State -->
                 <div id="repo-create-state" class="card repo-center-card" style="display: none;">
                     <svg class="create-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                    <h3>Let's create your repository.</h3>
-                    <p>Enter a name:</p>
+                    <h3>Create a repository</h3>
+                    <p>Enter a name for your new GitHub repo:</p>
                     <input type="text" id="new-repo-name" class="big-input" placeholder="e.g. visual-project">
                     <div id="repo-create-error" class="error-text"></div>
                     <button id="btn-do-create" class="primary-btn" style="margin-top:1.5rem;">Create repo</button>
                     <button id="btn-cancel-create" class="outline-btn" style="margin-top:0.5rem; width:100%;">Cancel</button>
                 </div>
 
+                <!-- Link Existing Repo State -->
+                <div id="repo-link-state" class="card" style="display: none; padding: 2rem;">
+                    <h3 style="margin-bottom: 0.5rem; text-align:center;">Link an existing repository</h3>
+                    <p class="text-muted" style="text-align:center; font-size: 0.9rem; margin-bottom: 1.5rem;">Select a repository from your GitHub account to link to this Studio project.</p>
+                    
+                    <input type="text" id="repo-search-input" class="big-input" style="margin-top:0; margin-bottom: 1rem; text-align:left; font-size:1rem;" placeholder="Search your repositories...">
+                    
+                    <div id="repo-list-container" class="repo-list">
+                        <!-- Repos injected here -->
+                    </div>
+                    
+                    <button id="btn-cancel-link" class="outline-btn" style="margin-top:1.5rem; width:100%;">Cancel</button>
+                </div>
+
+                <!-- Active Repo State -->
                 <div id="repo-active-state" style="display: none; width: 100%;">
                     <div class="content-header" style="margin-bottom: 1rem;">
                         <h2 id="active-repo-title">repository-name</h2>
                     </div>
 
-                    <!-- GitHub Style Tabs -->
                     <div class="gh-tabs">
                         <button class="gh-tab active" data-tab="tab-overview">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
@@ -261,7 +261,6 @@
                         </button>
                     </div>
 
-                    <!-- Panel: Overview -->
                     <div id="tab-overview" class="gh-tab-content active card">
                         <h3>Publish update</h3>
                         <form id="repo-publish-form" style="margin-top: 1rem;">
@@ -279,9 +278,7 @@
                         <div style="margin-top: 2.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
                             <h3>Repository README</h3>
                             <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 1rem;">Edit your project description below. It automatically converts to Markdown!</p>
-                            
                             <div id="readme-editor" style="border-radius: 8px; overflow: hidden; margin-bottom: 1rem; background: var(--bg-main);"></div>
-                            
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <button id="btn-save-readme" class="outline-btn">Set as description</button>
                                 <div id="readme-msg" style="font-size: 0.85rem; font-weight: 500;"></div>
@@ -289,19 +286,16 @@
                         </div>
                     </div>
 
-                    <!-- Panel: Timeline -->
                     <div id="tab-timeline" class="gh-tab-content card">
                         <h3>Commit History</h3>
                         <div id="repo-timeline" class="timeline" style="margin-top: 1.5rem;"></div>
                     </div>
 
-                    <!-- Panel: Pages -->
                     <div id="tab-pages" class="gh-tab-content card">
                         <div class="content-header">
                             <h3 style="color: var(--text-main);">GitHub Pages</h3>
                             <p class="text-muted">Host your visual as a live public website directly from your repository.</p>
                         </div>
-                        
                         <div class="toggle-group" style="margin-top: 1.5rem;">
                             <label class="switch">
                                 <input type="checkbox" id="pages-toggle">
@@ -309,7 +303,6 @@
                             </label>
                             <span id="pages-status-text">Enable GitHub Pages</span>
                         </div>
-
                         <div class="input-group" id="pages-url-group" style="display:none; margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
                             <label>Public URL</label>
                             <div class="copy-box">
@@ -320,8 +313,14 @@
                         </div>
                     </div>
 
-                    <!-- Panel: Settings -->
                     <div id="tab-settings" class="gh-tab-content card">
+                        <div class="danger-zone" style="margin-bottom: 1.5rem; border-color: var(--border-color);">
+                            <div style="flex:1;">
+                                <h3 style="color: var(--text-main);">Unlink repository</h3>
+                                <p class="text-muted" style="font-size: 0.85rem; margin-top: 0.3rem;">Disconnects this repo from your Studio project without deleting anything on GitHub.</p>
+                            </div>
+                            <button id="btn-unlink-repo" class="outline-btn">Unlink repo</button>
+                        </div>
                         <div class="danger-zone">
                             <div style="flex:1;">
                                 <h3 style="color: var(--error);">Delete this repository</h3>
@@ -335,20 +334,17 @@
         </main>
     </div>
 
-    <!-- Normal Loader -->
     <div id="loader" class="loader-overlay" style="display: none;">
         <div class="spinner"></div>
         <p id="loader-text">Communicating with GitHub...</p>
     </div>
 
-    <!-- Custom Pages Loader -->
     <div id="pages-loader" class="loader-overlay" style="display: none; background: rgba(2, 6, 23, 0.95);">
         <img src="/load/opening.gif" class="dark-mode-gif" width="80" height="80" alt="Publishing...">
         <h3 style="margin-top:1rem; font-size:1.5rem; color:var(--text-main);">Publishing public website...</h3>
         <p style="color:var(--text-muted); max-width:400px; text-align:center; line-height:1.5; margin-top:0.5rem;">Hang tight. We're publishing the public Github Pages site to the world wide web. This might take a little while - all other updates to the app have already been published.</p>
     </div>
 
-    <!-- Toast UI Script -->
     <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
     <script src="script.js"></script>
 </body>

@@ -34,12 +34,21 @@ const viewGistBtn = document.getElementById('view-gist-btn');
 // Repo Elements
 const repoPromptState = document.getElementById('repo-prompt-state');
 const repoCreateState = document.getElementById('repo-create-state');
+const repoLinkState = document.getElementById('repo-link-state');
 const repoActiveState = document.getElementById('repo-active-state');
+
 const btnShowCreate = document.getElementById('btn-show-create');
 const btnCancelCreate = document.getElementById('btn-cancel-create');
 const btnDoCreate = document.getElementById('btn-do-create');
 const newRepoNameInput = document.getElementById('new-repo-name');
 const repoCreateError = document.getElementById('repo-create-error');
+
+const btnShowLink = document.getElementById('btn-show-link');
+const btnCancelLink = document.getElementById('btn-cancel-link');
+const repoSearchInput = document.getElementById('repo-search-input');
+const repoListContainer = document.getElementById('repo-list-container');
+const btnUnlinkRepo = document.getElementById('btn-unlink-repo');
+
 const activeRepoTitle = document.getElementById('active-repo-title');
 
 // Repo Tabs
@@ -73,6 +82,7 @@ let htmlPayload = '';
 let readmeEditorInstance = null;
 let isPagesEnabled = false;
 let repoDefaultBranch = 'main';
+let cachedRepos = []; // Store fetched repos for quick filtering
 
 // Dynamically link repo to the Studio Project
 const currentProjectId = localStorage.getItem('visualiser_current_project_id');
@@ -158,21 +168,18 @@ async function validateAndLoadDashboard(token) {
             throw new Error("Token expired or invalid.");
         }
 
-        // Verify strict scopes if it's a new validation
         const scopes = res.headers.get('x-oauth-scopes') || "";
         const required = ['repo', 'gist', 'delete_repo'];
         const missing = required.filter(s => !scopes.includes(s));
         
-        if (missing.length > 0 && !scopes.includes('user')) { // allow if full access
+        if (missing.length > 0 && !scopes.includes('user')) {
             throw new Error(`Your PAT is missing required permissions: ${missing.join(', ')}. Please create a new one with all boxes checked.`);
         }
 
         const userData = await res.json();
         
-        // Cache username
         localStorage.setItem('visualiser_gh_username', userData.login);
         
-        // Populate Dashboard
         document.getElementById('gh-avatar').src = userData.avatar_url;
         document.getElementById('gh-name').innerText = userData.name || userData.login;
         document.getElementById('gh-handle').innerText = '@' + userData.login;
@@ -191,7 +198,7 @@ async function validateAndLoadDashboard(token) {
         validationError.innerText = err.message;
         validationError.style.display = 'block';
         if (wizardState.style.display === 'block') {
-            showWizard(); // Keep them in the wizard to fix it
+            showWizard();
         }
     } finally {
         loader.style.display = 'none';
@@ -243,7 +250,6 @@ saveTokenBtn.addEventListener('click', async () => {
     saveTokenBtn.disabled = true;
     try {
         await validateAndLoadDashboard(token);
-        // If successful, dashboard takes over. Only save locally on success.
         if (dashboardState.style.display === 'block') {
             localStorage.setItem('visualiser_github_pat', token);
         }
@@ -323,6 +329,7 @@ function initRepoView() {
     } else {
         repoPromptState.style.display = 'flex';
         repoCreateState.style.display = 'none';
+        repoLinkState.style.display = 'none';
         repoActiveState.style.display = 'none';
     }
 }
@@ -331,6 +338,7 @@ async function showRepoActiveUI(repoName) {
     activeRepoTitle.innerText = repoName;
     repoPromptState.style.display = 'none';
     repoCreateState.style.display = 'none';
+    repoLinkState.style.display = 'none';
     repoActiveState.style.display = 'block';
     
     document.querySelector('.gh-tab[data-tab="tab-overview"]').click();
@@ -339,15 +347,13 @@ async function showRepoActiveUI(repoName) {
     await checkPagesStatus(repoName);
 }
 
+// --- CREATE REPO ---
 newRepoNameInput.addEventListener('input', () => {
     newRepoNameInput.value = newRepoNameInput.value.replace(/[^a-zA-Z0-9_\.-]/g, '');
 });
 
 btnShowCreate.addEventListener('click', () => {
-    if (!htmlPayload) {
-        alert("You have no payload in memory. Create a visual first.");
-        return;
-    }
+    if (!htmlPayload) { alert("You have no payload in memory. Create a visual first."); return; }
     repoPromptState.style.display = 'none';
     repoCreateState.style.display = 'flex';
 });
@@ -390,6 +396,87 @@ btnDoCreate.addEventListener('click', async () => {
     }
 });
 
+// --- LINK EXISTING REPO ---
+btnShowLink.addEventListener('click', async () => {
+    const token = localStorage.getItem('visualiser_github_pat');
+    if (!token) { alert("Sign in via Account tab first."); return; }
+    
+    repoPromptState.style.display = 'none';
+    repoLinkState.style.display = 'flex';
+    repoSearchInput.value = '';
+    repoListContainer.innerHTML = '';
+    
+    loaderText.innerText = "Fetching your repositories...";
+    loader.style.display = 'flex';
+
+    try {
+        const res = await fetch('https://api.github.com/user/repos?sort=updated&per_page=100&type=owner', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!res.ok) throw new Error("Failed to load repositories.");
+        cachedRepos = await res.json();
+        renderRepoList(cachedRepos);
+
+    } catch(err) {
+        repoListContainer.innerHTML = `<p class="error-text">${err.message}</p>`;
+    } finally {
+        loader.style.display = 'none';
+    }
+});
+
+btnCancelLink.addEventListener('click', initRepoView);
+
+repoSearchInput.addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase();
+    const filtered = cachedRepos.filter(r => r.name.toLowerCase().includes(term));
+    renderRepoList(filtered);
+});
+
+function renderRepoList(repos) {
+    repoListContainer.innerHTML = '';
+    if (repos.length === 0) {
+        repoListContainer.innerHTML = '<p class="text-muted" style="text-align:center; padding: 1rem;">No repositories found.</p>';
+        return;
+    }
+    
+    repos.forEach(repo => {
+        const el = document.createElement('div');
+        el.className = 'repo-list-item';
+        
+        const badge = repo.private ? `<span class="repo-badge">Private</span>` : `<span class="repo-badge">Public</span>`;
+        const updatedDate = new Date(repo.updated_at).toLocaleDateString();
+
+        el.innerHTML = `
+            <span class="repo-list-name">${repo.name}</span>
+            <div class="repo-list-meta">
+                ${badge}
+                <span>Updated ${updatedDate}</span>
+            </div>
+        `;
+        
+        el.addEventListener('click', () => {
+            if (!repo.permissions.push) {
+                alert("You don't have write access to this repository.");
+                return;
+            }
+            localStorage.setItem(repoStorageKey, repo.name);
+            showRepoActiveUI(repo.name);
+        });
+        
+        repoListContainer.appendChild(el);
+    });
+}
+
+btnUnlinkRepo.addEventListener('click', () => {
+    if(confirm("Disconnect this repository from your project? It will not be deleted from GitHub.")) {
+        localStorage.removeItem(repoStorageKey);
+        initRepoView();
+    }
+});
+
+
+// --- TABS & PAGES ---
 ghTabs.forEach(tab => {
     tab.addEventListener('click', () => {
         ghTabs.forEach(t => t.classList.remove('active'));
@@ -401,7 +488,6 @@ ghTabs.forEach(tab => {
     });
 });
 
-// --- GitHub Pages Management ---
 async function checkPagesStatus(repoName, isPolling = false) {
     const token = localStorage.getItem('visualiser_github_pat');
     if (!token) return false;
