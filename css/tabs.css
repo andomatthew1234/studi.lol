@@ -1,0 +1,27 @@
+.tab-nav { display: flex; position: relative; border-bottom: 1px solid var(--border); background-color: #fcfcfc; }
+.tab-btn {
+    flex: 1; padding: 1.25rem; background: none; border: none;
+    color: var(--text-muted); font-size: 1rem; font-weight: 600;
+    cursor: pointer; transition: color 0.2s; position: relative; z-index: 1;
+}
+.tab-btn.active { color: var(--primary); }
+.nav-slider {
+    position: absolute; bottom: -1px; left: 0; height: 3px;
+    background-color: var(--primary); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2;
+}
+.tab-content { padding: 2rem; }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+.projects-grid { display: grid; gap: 1rem; }
+.project-card {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem 1.25rem; background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 8px; cursor: pointer; transition: border-color 0.2s;
+}
+.project-card:hover { border-color: var(--primary); }
+.project-info h3 { margin: 0 0 0.25rem 0; font-size: 1.1rem; }
+.project-info p { margin: 0; font-size: 0.85rem; color: var(--text-muted); }
+.delete-btn { background: none; border: none; color: var(--text-muted); padding: 0.5rem; cursor: pointer; border-radius: 6px; }
+.delete-btn:hover { color: var(--danger); background-color: #fee2e2; }

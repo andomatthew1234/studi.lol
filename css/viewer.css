@@ -1,0 +1,50 @@
+.viewer-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: var(--bg-color); z-index: 1000; display: flex; flex-direction: column;
+}
+.viewer-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2rem; background: var(--card-bg); border-bottom: 1px solid var(--border); height: 70px;
+}
+.viewer-header-left { display: flex; align-items: center; gap: 1.5rem; }
+.viewer-back-btn { width: auto; padding: 0.5rem 1rem; margin: 0; }
+.viewer-tabs { display: flex; height: 100%; position: relative; }
+.v-tab-btn { background: none; border: none; padding: 0 1.5rem; font-weight: 600; color: var(--text-muted); cursor: pointer; position: relative; z-index: 1; }
+.v-tab-btn.active { color: var(--primary); }
+.tab-slider { position: absolute; bottom: 0; left: 0; height: 3px; background-color: var(--primary); transition: all 0.3s; z-index: 2; }
+
+.viewer-content { flex: 1; position: relative; overflow: hidden; }
+.v-pane { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; }
+.v-pane.active { display: flex; }
+#viewerFrame, #masteryFrame { flex: 1; width: 100%; height: 100%; border: none; background: white; display: block; }
+
+/* Fixed Study Sidebar overlapping logic */
+.study-layout { display: flex; width: 100%; height: 100%; }
+.study-sidebar { width: 70px; background: var(--card-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 1.5rem; gap: 1rem; }
+.s-tool-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 0.75rem; border-radius: 12px; }
+.s-tool-btn.active { color: var(--primary); background: #eff6ff; }
+.study-content { flex: 1; position: relative; overflow: hidden; background: var(--bg-color); }
+.s-view { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none !important; background: var(--bg-color); z-index: 1; }
+.s-view.active { display: block !important; z-index: 2; }
+.s-view.audio-container.active { display: flex !important; }
+
+/* Audio & Quiz Boxes */
+.audio-container { overflow-y: auto; padding: 2rem; justify-content: center; }
+.audio-inner-wrapper { max-width: 700px; width: 100%; }
+.audio-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
+.audio-card { border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; background: var(--card-bg); display: flex; flex-direction: column; }
+.audio-setup-pane { display: none; margin-top: 2rem; padding: 2rem; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); }
+.char-counter { text-align: right; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; font-weight: 600; }
+
+.quiz-center-box { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 2rem; }
+.css-radar { position: relative; width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--primary); overflow: hidden; margin: 0 auto 1rem; }
+.css-radar::before { content: ''; position: absolute; top: 50%; left: 50%; width: 50%; height: 50%; background: linear-gradient(45deg, rgba(59,130,246,0), rgba(59,130,246,0.8)); transform-origin: 0% 0%; animation: radar-spin 1.5s linear infinite; }
+@keyframes radar-spin { to { transform: rotate(360deg); } }
+
+/* Clawboard */
+.claw-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 2rem; background: var(--card-bg); border-bottom: 1px solid var(--border); }
+.claw-tools-left, .claw-tools-right { display: flex; align-items: center; gap: 0.75rem; }
+.claw-tool { width: 32px; height: 32px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: transform 0.1s; }
+.claw-tool.active { border-color: var(--primary); transform: scale(1.1); box-shadow: 0 0 0 2px white inset; }
+.canvas-container { flex: 1; width: 100%; height: 100%; background: #fcfcfc; overflow: hidden; cursor: crosshair; }
+canvas { touch-action: none; display: block; }

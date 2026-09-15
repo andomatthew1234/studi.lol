@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>visualiser.lol</title>
+    <!-- Dynamic Favicon -->
+    <link id="app-favicon" rel="icon" type="image/png" href="/favicon.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Top Nav ONLY visible on Home State (Fallback) -->
+    <header id="home-top-nav" class="top-nav"></header>
+
+    <!-- Projects Modal -->
+    <div id="projects-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Your Studio Projects</h2>
+                <button id="close-modal-btn" class="icon-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div id="projects-list" class="projects-list">
+                <!-- Projects injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Studio Transition Loader -->
+    <div id="studio-loader" style="display: none;">
+        <img id="studio-loader-gif" class="dark-mode-gif" src="/load/opening.gif" alt="Opening Studio..." width="80" height="80">
+        <div id="studio-loader-text" class="loader-text">Preparing your codespace...</div>
+    </div>
+
+    <div id="app-container" class="view-home">
+        <!-- Sidebar / Center Chat Panel -->
+        <aside id="chat-panel">
+            <div class="branding">
+                <!-- Standard Home Branding -->
+                <div class="branding-home">
+                    <h1>visualiser.lol</h1>
+                    <p>Code, not pixels.</p>
+                </div>
+                <!-- Studio Branding -->
+                <div class="branding-studio">
+                    <h2>visualiser.lol</h2>
+                    <h1 class="gradient-text">Studio</h1>
+                </div>
+            </div>
+            
+            <!-- UNIVERSAL SIDEBAR CONTROLS -->
+            <div class="sidebar-controls">
+                <div class="control-row hide-in-studio">
+                    <button class="outline-btn small-btn projects-action">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> 
+                        Projects
+                    </button>
+                    <button class="outline-btn small-btn config-action">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        API Key
+                    </button>
+                </div>
+                <div class="control-row show-in-workspace">
+                    <button id="new-project-btn" class="outline-btn small-btn" title="New Project">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        New
+                    </button>
+                    <!-- Rainbow Animated Button -->
+                    <button id="studio-btn" class="rainbow-border">
+                        <div class="rainbow-inner">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;" id="studio-btn-icon"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                            <span id="studio-btn-text">Open in Studio</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="chat-history" class="chat-history"></div>
+            
+            <div class="input-wrapper" id="input-wrapper">
+                <textarea id="prompt" placeholder="E.g. A green animated loading spinner..."></textarea>
+                <div class="input-footer">
+                    <span id="daily-limit-display" class="limit-text" style="font-size: 0.75rem;"></span>
+                    <button id="generate-btn">
+                        Enter
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 10 4 15 9 20"></polyline><path d="M20 4v7a4 4 0 0 1-4 4H4"></path></svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Home Mode Prompt Chips -->
+            <div class="prompt-chips hide-in-studio">
+                <button class="chip">Audio waveform</button>
+                <button class="chip">Particle orb</button>
+                <button class="chip">Crypto ticker</button>
+            </div>
+
+            <!-- Initial Full-Box Loader -->
+            <div id="initial-loader">
+                <img id="initial-loader-gif" src="" alt="Loading..." width="80" height="80">
+                <div id="initial-loader-text" class="loader-text">Understanding the task...</div>
+            </div>
+        </aside>
+
+        <!-- Preview Panel -->
+        <main id="preview-panel">
+            <div class="iframe-container">
+                <!-- STUDIO ONLY TOOLBAR -->
+                <div class="preview-toolbar">
+                    <!-- LEFT SIDE: GITHUB BUTTON -->
+                    <div class="toolbar-left">
+                        <button id="github-btn" class="github-btn" title="Publish to GitHub">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                            GitHub
+                        </button>
+                    </div>
+                    
+                    <!-- RIGHT SIDE: TOOLS -->
+                    <div class="toolbar-right" style="display:flex; gap: 0.5rem; justify-content: flex-end;">
+                        <!-- Console Toggle -->
+                        <button id="console-toggle-btn" class="icon-btn" title="Toggle Console">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                        </button>
+                        <button id="fullscreen-btn" class="icon-btn" title="Fullscreen">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+                        </button>
+                        <button id="replay-btn" class="icon-btn" title="Replay Animation">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                        </button>
+                        <button id="code-peek-btn" class="icon-btn" title="Peek Code">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                        </button>
+                        <button id="download-btn" class="icon-btn" title="Download Blob (.html)">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="toast-loader" class="toast-loader" style="display: none;">
+                    <img class="mini-gif dark-mode-gif" src="" alt="Loading...">
+                    <span>Making the first draft...</span>
+                </div>
+
+                <div id="code-view" class="code-view"></div>
+
+                <iframe id="preview-frame" sandbox="allow-scripts" title="Live Preview"></iframe>
+
+                <!-- Slide-out Console Drawer -->
+                <div id="console-drawer" class="console-drawer">
+                    <div class="console-header">
+                        <div style="display:flex; align-items:center; gap:0.5rem;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                            <h3 style="font-size: 1rem; margin:0;">Console</h3>
+                        </div>
+                        <button id="close-console-btn" class="icon-btn" style="padding:0;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                    <div id="console-logs" class="console-logs">
+                        <div class="console-empty">No errors yet. You're a legend.</div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

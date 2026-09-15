@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>studi.lol - AI Study Guide Generator</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/tabs.css">
+    <link rel="stylesheet" href="css/viewer.css">
+</head>
+<body>
+    <div class="app-wrapper" id="mainApp">
+        <header class="app-header">
+            <h1>studi.lol 🧠</h1>
+            <p>Turn your notes into interactive study guides.</p>
+        </header>
+
+        <div class="main-card">
+            <nav class="tab-nav">
+                <button class="tab-btn active" data-target="projects-tab">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                    Projects
+                </button>
+                <button class="tab-btn" data-target="create-tab">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Create
+                </button>
+                <button class="tab-btn" data-target="config-tab">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    Config
+                </button>
+                <div class="nav-slider" id="mainTabSlider"></div>
+            </nav>
+
+            <div class="tab-content">
+                <div id="projects-tab" class="tab-pane active">
+                    <div class="config-header"><h2>Your Study Guides</h2></div>
+                    <p class="sub-text" id="projectsEmptyText">You haven't created any guides yet. Head to the Create tab!</p>
+                    <div id="projectsList" class="projects-grid"></div>
+                </div>
+
+                <div id="create-tab" class="tab-pane">
+                    <div id="input-section">
+                        <div class="input-group">
+                            <label>Provide your study material</label>
+                            <div class="file-upload-box" id="dropzone">
+                                <input type="file" id="fileInput" accept=".pdf,.txt,.md,.csv,image/jpeg,image/png" hidden>
+                                <label for="fileInput" id="fileLabel">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg><br>
+                                    <span id="fileNameDisplay">Click or drag to upload (PDF, TXT, Images)</span>
+                                </label>
+                                <button id="clearFileBtn" title="Remove file" style="display:none;">&times;</button>
+                            </div>
+                            <div class="divider"><span>OR</span></div>
+                            <textarea id="sourceText" rows="6" placeholder="Paste your notes or syllabus here..."></textarea>
+                        </div>
+                        <button id="generateBtn" class="primary-btn">Generate Study Guide</button>
+                        <p id="errorText" class="error-text"></p>
+                    </div>
+
+                    <div id="status-section" style="display: none;">
+                        <div id="icon-container">
+                            <div id="radarIcon" class="css-radar"></div>
+                            <svg id="successIcon" style="display: none;" width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        </div>
+                        <h2 id="statusMessage">Connecting to Gemini...</h2>
+                        <div class="action-buttons">
+                            <button id="saveProjectBtn" class="success-btn" style="display: none;">Save Project</button>
+                            <button id="resetBtn" class="secondary-btn" style="display: none;">Discard & Try Again</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="config-tab" class="tab-pane">
+                    <div class="config-header">
+                        <h2>API Settings</h2>
+                        <span id="saveBadge" class="save-badge">Saved ✓</span>
+                    </div>
+                    <p class="sub-text">Your API key is stored securely in your browser's local storage.</p>
+                    <div class="input-group">
+                        <label for="apiKey">Google Gemini API Key</label>
+                        <input type="password" id="apiKey" placeholder="AQ.Ab8... or AIzaSy...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FULLSCREEN VIEWER -->
+    <div id="projectViewer" class="viewer-overlay" style="display: none;">
+        <div class="viewer-header">
+            <div class="viewer-header-left">
+                <button id="closeViewerBtn" class="secondary-btn viewer-back-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Back
+                </button>
+                <h2 id="viewerTitle">Study Guide</h2>
+            </div>
+            <div class="viewer-tabs">
+                <button class="v-tab-btn active" data-vtarget="v-study">Study</button>
+                <button class="v-tab-btn" data-vtarget="v-clawboard">Clawboard</button>
+                <button class="v-tab-btn" data-vtarget="v-ask">Ask AI</button>
+                <button class="v-tab-btn" data-vtarget="v-mastery">Mastery</button>
+                <div class="tab-slider" id="vTabSlider"></div>
+            </div>
+        </div>
+        
+        <div class="viewer-content">
+            <div id="v-study" class="v-pane active">
+                <div class="study-layout">
+                    <div class="study-sidebar">
+                        <button class="s-tool-btn active" data-sview="s-text" title="Read Text">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        </button>
+                        <button class="s-tool-btn" data-sview="s-audio" title="Listen to Audio">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                        </button>
+                    </div>
+                    <div class="study-content">
+                        <div id="s-text" class="s-view active">
+                            <iframe id="viewerFrame" sandbox="allow-scripts"></iframe>
+                        </div>
+                        <div id="s-audio" class="s-view audio-container">
+                            <div class="audio-inner-wrapper">
+                                <h2>Audio Revision</h2>
+                                <div class="audio-options-grid">
+                                    <div class="audio-card">
+                                        <h3>Generate with Gemini</h3>
+                                        <button id="selectGeminiAudioBtn" class="primary-btn">Use Gemini TTS</button>
+                                    </div>
+                                    <div class="audio-card">
+                                        <h3>SpeechSynthesis</h3>
+                                        <button id="selectSpeechSynthBtn" class="secondary-btn">Use Basic Audio</button>
+                                    </div>
+                                </div>
+                                <div id="geminiAudioUI" class="audio-setup-pane">
+                                    <textarea id="audioSourceText" rows="6" maxlength="800" placeholder="Paste the exact text here..."></textarea>
+                                    <div id="audioInputControls"><button id="generateAudioBtn" class="primary-btn">Generate</button><p id="audioErrorText" class="error-text"></p></div>
+                                    <div id="audioLoadingState" class="quiz-center-box" style="display: none;"><h3 id="audioStatusMessage">Connecting...</h3></div>
+                                    <div id="audioPlayerContainer" class="audio-player-box">
+                                        <button id="playGeminiAudioBtn" class="success-btn">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="margin-right:8px; vertical-align: middle;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Play Audio
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="speechSynthUI" class="audio-setup-pane">
+                                    <button id="playBasicAudioBtn" class="success-btn">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="margin-right:8px; vertical-align: middle;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Read Full Guide
+                                    </button>
+                                    <button id="stopBasicAudioBtn" class="danger-btn" style="display:none;">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="margin-right:8px; vertical-align: middle;"><rect x="6" y="6" width="12" height="12"></rect></svg> Stop Reading
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="v-clawboard" class="v-pane">
+                <div class="claw-toolbar">
+                    <div class="claw-tools-left">
+                        <button class="claw-tool active" data-color="#1e293b" style="background-color: #1e293b;"></button>
+                        <button class="claw-tool" data-color="#ef4444" style="background-color: #ef4444;"></button>
+                        <button class="claw-tool" data-color="#3b82f6" style="background-color: #3b82f6;"></button>
+                        <button id="clawEraserBtn" class="secondary-btn tool-text-btn">Eraser</button>
+                        <button id="clawClearBtn" class="secondary-btn tool-text-btn">Clear</button>
+                    </div>
+                    <div class="claw-tools-right">
+                        <span id="clawSaveBadge" class="save-badge">Saved ✓</span>
+                        <button id="clawSaveBtn" class="primary-btn">Save Board</button>
+                    </div>
+                </div>
+                <div class="canvas-container" id="canvasContainer"><canvas id="clawCanvas"></canvas></div>
+            </div>
+
+            <div id="v-ask" class="v-pane"><div class="quiz-center-box"><h3>Ask AI</h3><p>Coming soon!</p></div></div>
+
+            <div id="v-mastery" class="v-pane">
+                <div id="masteryEmptyState" class="quiz-center-box">
+                    <button id="generateMasteryBtn" class="primary-btn">Generate Quiz</button>
+                    <p id="masteryErrorText" class="error-text"></p>
+                </div>
+                <div id="masteryLoadingState" class="quiz-center-box" style="display: none;"><h3 id="masteryStatusMessage">Connecting...</h3></div>
+                <iframe id="masteryFrame" style="display:none;" sandbox="allow-scripts"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/store.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/clawboard.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

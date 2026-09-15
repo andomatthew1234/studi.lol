@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publish - visualiser.lol</title>
+    <!-- Dynamic GH Favicon -->
+    <link rel="icon" type="image/png" href="/gh_favicon.png">
+    
+    <!-- Toast UI Editor Styles for Rich Text -->
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/theme/toastui-editor-dark.min.css" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="gh-app">
+        <!-- Sidebar Navigation -->
+        <aside class="gh-sidebar">
+            <div class="sidebar-brand">
+                <button id="back-btn" class="icon-btn" title="Back to Studio">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                </button>
+                <div>
+                    <h2>visualiser.lol</h2>
+                    <h1 class="gradient-text" style="font-size: 1.5rem;">Publish</h1>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-target="view-config">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    Configuration
+                </button>
+                <button class="nav-item" data-target="view-gist">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    <div style="display:flex; flex-direction:column; align-items:flex-start;">
+                        <span>Gist</span>
+                        <span class="sub-text">Fastest, quick sharing</span>
+                    </div>
+                </button>
+                <button class="nav-item" data-target="view-repo">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                    <div style="display:flex; flex-direction:column; align-items:flex-start;">
+                        <span>Repository</span>
+                        <span class="sub-text">Commit & host files</span>
+                    </div>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="gh-content">
+            
+            <!-- View: Configuration -->
+            <section id="view-config" class="view-section active">
+                <div class="content-header">
+                    <h2>Setup GitHub Access</h2>
+                    <p class="text-muted">Follow these steps to generate a Personal Access Token.</p>
+                </div>
+                <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
+                <div class="wizard-container card">
+                    <div class="wizard-step active" id="step-1">
+                        <h3>Step 1: Go to the website</h3>
+                        <p>Select the button below to open the GitHub tokens page.</p>
+                        <a href="https://github.com/settings/tokens/new" target="_blank" class="primary-btn outline" style="width:fit-content; margin: 1rem 0;">Open GitHub Settings</a>
+                        <div class="warning-box">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            <span>You may need to re-sign into GitHub for security reasons.</span>
+                        </div>
+                        <img src="/gh/step_img/1.png" alt="GitHub login screen" class="step-img">
+                    </div>
+                    <div class="wizard-step" id="step-2">
+                        <h3>Step 2: Give it a name</h3>
+                        <p>Make sure you enter a name for the PAT in the <strong>Note</strong> field so you remember what it's for.</p>
+                        <div class="copy-box">
+                            <input type="text" id="copy-note-text" value="visualiser.lol PAT" readonly>
+                            <button class="outline-btn small-btn copy-action" data-target="copy-note-text">Copy</button>
+                        </div>
+                        <img src="/gh/step_img/2.png" alt="Note field screenshot" class="step-img">
+                    </div>
+                    <div class="wizard-step" id="step-3">
+                        <h3>Step 3: Add permissions</h3>
+                        <p>Check the boxes for the following permissions:</p>
+                        <ul class="permission-list">
+                            <li>repo</li><li>write:packages</li><li>gist</li><li>user</li><li>project</li><li>delete_repo</li>
+                        </ul>
+                        <div class="warning-box">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            <span>Functions will not work as expected if you do not add these permissions. Or, as shown highlighted in the red circle in the example below.</span>
+                        </div>
+                        <img src="/gh/step_img/3.png" alt="Permissions screenshot" class="step-img">
+                    </div>
+                    <div class="wizard-step" id="step-4">
+                        <h3>Step 4: Press create</h3>
+                        <p>Scroll to the bottom and select the big green button to create your PAT!</p>
+                        <img src="/gh/step_img/4.png" alt="Create button screenshot" class="step-img">
+                    </div>
+                    <div class="wizard-step" id="step-5">
+                        <h3>Step 5: Copy your PAT!</h3>
+                        <p>Press the Copy button on GitHub and paste your PAT in here.</p>
+                        <div class="input-group" style="margin-top: 1rem;">
+                            <label for="wizard-token">Personal Access Token</label>
+                            <input type="password" id="wizard-token" placeholder="ghp_...">
+                        </div>
+                        <button id="save-token-btn" class="primary-btn">Save & Continue</button>
+                    </div>
+                    <div class="wizard-footer">
+                        <button id="wizard-prev" class="outline-btn" style="visibility: hidden;">Back</button>
+                        <button id="wizard-next" class="primary-btn" style="width: auto;">Next Step</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- View: Gist Publishing -->
+            <section id="view-gist" class="view-section">
+                <div class="content-header">
+                    <h2>Publish to Gist</h2>
+                    <p class="text-muted">Instantly share your component as a GitHub Gist.</p>
+                </div>
+                <div class="card" id="gist-card">
+                    <div id="gist-empty-state" style="display: none;" class="error-box">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        <p>No project found in memory. Generate a visual in the Studio first.</p>
+                    </div>
+                    <form id="gist-form">
+                        <div class="input-group">
+                            <label for="gh-token">GitHub Token</label>
+                            <div style="display:flex; gap:0.5rem;">
+                                <input type="password" id="gh-token" placeholder="ghp_..." required style="flex:1;">
+                                <button type="button" class="outline-btn" onclick="document.querySelector('[data-target=\'view-config\']').click()">Setup</button>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="gist-desc">Description</label>
+                            <input type="text" id="gist-desc" value="Created with visualiser.lol" required>
+                        </div>
+                        <div class="toggle-group">
+                            <label class="switch">
+                                <input type="checkbox" id="gist-public" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <span>Make this Gist public</span>
+                        </div>
+                        <button type="submit" id="gist-publish-btn" class="primary-btn">Publish to Gist</button>
+                        <div id="gist-error-msg" class="error-text"></div>
+                    </form>
+                    <div id="gist-success-state" style="display: none;" class="success-box">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        <h3>Published Successfully!</h3>
+                        <p>Your component is live on GitHub.</p>
+                        <div class="link-wrapper">
+                            <input type="text" id="gist-link" readonly>
+                            <button class="outline-btn copy-action" data-target="gist-link">Copy</button>
+                        </div>
+                        <a id="view-gist-btn" href="#" target="_blank" class="primary-btn outline">View on GitHub</a>
+                        <button class="outline-btn" style="margin-top:1rem; width:100%;" onclick="window.location.reload()">Publish Another</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- View: Repository Publishing -->
+            <section id="view-repo" class="view-section" style="max-width: 900px;">
+                <div id="repo-prompt-state" class="card repo-center-card">
+                    <svg class="alert-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    <h3>Create a repository?</h3>
+                    <p>A repo has not been created for this project yet. Create one now?</p>
+                    <div style="display:flex; gap:1rem; margin-top:1.5rem;">
+                        <button id="btn-show-create" class="primary-btn">Create one</button>
+                        <button class="outline-btn" onclick="document.querySelector('[data-target=\'view-config\']').click()">Cancel</button>
+                    </div>
+                </div>
+
+                <div id="repo-create-state" class="card repo-center-card" style="display: none;">
+                    <svg class="create-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                    <h3>Let's create your repository.</h3>
+                    <p>Enter a name:</p>
+                    <input type="text" id="new-repo-name" class="big-input" placeholder="e.g. visual-project">
+                    <div id="repo-create-error" class="error-text"></div>
+                    <button id="btn-do-create" class="primary-btn" style="margin-top:1.5rem;">Create repo</button>
+                    <button id="btn-cancel-create" class="outline-btn" style="margin-top:0.5rem; width:100%;">Cancel</button>
+                </div>
+
+                <div id="repo-active-state" style="display: none; width: 100%;">
+                    <div class="content-header" style="margin-bottom: 1rem;">
+                        <h2 id="active-repo-title">repository-name</h2>
+                    </div>
+
+                    <!-- GitHub Style Tabs -->
+                    <div class="gh-tabs">
+                        <button class="gh-tab active" data-tab="tab-overview">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                            Management overview
+                        </button>
+                        <button class="gh-tab" data-tab="tab-timeline">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            Timeline
+                        </button>
+                        <button class="gh-tab" data-tab="tab-pages">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                            Public Website and Pages
+                        </button>
+                        <button class="gh-tab" data-tab="tab-settings">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                            Settings
+                        </button>
+                    </div>
+
+                    <!-- Panel: Overview -->
+                    <div id="tab-overview" class="gh-tab-content active card">
+                        <h3>Publish update</h3>
+                        <form id="repo-publish-form" style="margin-top: 1rem;">
+                            <div class="input-group">
+                                <label for="commit-msg">Commit Message</label>
+                                <input type="text" id="commit-msg" value="Update visual component" required>
+                            </div>
+                            <button type="submit" id="repo-publish-btn" class="primary-btn">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                                Publish to Repository
+                            </button>
+                            <div id="repo-error-msg" class="error-text"></div>
+                        </form>
+
+                        <div style="margin-top: 2.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+                            <h3>Repository README</h3>
+                            <p class="text-muted" style="font-size: 0.85rem; margin-bottom: 1rem;">Edit your project description below. It automatically converts to Markdown!</p>
+                            
+                            <div id="readme-editor" style="border-radius: 8px; overflow: hidden; margin-bottom: 1rem; background: var(--bg-main);"></div>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <button id="btn-save-readme" class="outline-btn">Set as description</button>
+                                <div id="readme-msg" style="font-size: 0.85rem; font-weight: 500;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel: Timeline -->
+                    <div id="tab-timeline" class="gh-tab-content card">
+                        <h3>Commit History</h3>
+                        <div id="repo-timeline" class="timeline" style="margin-top: 1.5rem;"></div>
+                    </div>
+
+                    <!-- Panel: Pages -->
+                    <div id="tab-pages" class="gh-tab-content card">
+                        <div class="content-header">
+                            <h3 style="color: var(--text-main);">GitHub Pages</h3>
+                            <p class="text-muted">Host your visual as a live public website directly from your repository.</p>
+                        </div>
+                        
+                        <div class="toggle-group" style="margin-top: 1.5rem;">
+                            <label class="switch">
+                                <input type="checkbox" id="pages-toggle">
+                                <span class="slider"></span>
+                            </label>
+                            <span id="pages-status-text">Enable GitHub Pages</span>
+                        </div>
+
+                        <div class="input-group" id="pages-url-group" style="display:none; margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+                            <label>Public URL</label>
+                            <div class="copy-box">
+                                <input type="text" id="pages-url-input" readonly>
+                                <button class="outline-btn small-btn copy-action" data-target="pages-url-input">Copy</button>
+                            </div>
+                            <a id="pages-visit-btn" href="#" target="_blank" class="primary-btn outline" style="margin-top: 1rem;">Visit Website</a>
+                        </div>
+                    </div>
+
+                    <!-- Panel: Settings -->
+                    <div id="tab-settings" class="gh-tab-content card">
+                        <div class="danger-zone">
+                            <div style="flex:1;">
+                                <h3 style="color: var(--error);">Delete this repository</h3>
+                                <p class="text-muted" style="font-size: 0.85rem; margin-top: 0.3rem;">Once deleted, it will be removed from GitHub permanently.</p>
+                            </div>
+                            <button id="btn-delete-repo" class="danger-btn">Delete repository</button>
+                        </div>
+                        <p class="text-muted" style="margin-top: 2rem; text-align: center; font-size: 0.85rem;">More settings coming soon.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Normal Loader -->
+    <div id="loader" class="loader-overlay" style="display: none;">
+        <div class="spinner"></div>
+        <p id="loader-text">Communicating with GitHub...</p>
+    </div>
+
+    <!-- Custom Pages Loader -->
+    <div id="pages-loader" class="loader-overlay" style="display: none; background: rgba(2, 6, 23, 0.95);">
+        <img src="/load/opening.gif" class="dark-mode-gif" width="80" height="80" alt="Publishing...">
+        <h3 style="margin-top:1rem; font-size:1.5rem; color:var(--text-main);">Publishing public website...</h3>
+        <p style="color:var(--text-muted); max-width:400px; text-align:center; line-height:1.5; margin-top:0.5rem;">Hang tight. We're publishing the public Github Pages site to the world wide web. This might take a little while - all other updates to the app have already been published.</p>
+    </div>
+
+    <!-- Toast UI Script -->
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
