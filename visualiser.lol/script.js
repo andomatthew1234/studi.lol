@@ -1,4 +1,3 @@
-// PRELOAD ALL GIFS IMMEDIATELY FOR SEAMLESS TRANSITION
 const preloadedGifs = [];
 ['1.gif', '2.gif', '3.gif', '4.gif', 'opening.gif'].forEach(src => {
     const img = new Image();
@@ -28,15 +27,13 @@ const closeModalBtn = document.getElementById('close-modal-btn');
 const projectsList = document.getElementById('projects-list');
 const previewFrame = document.getElementById('preview-frame');
 const codeView = document.getElementById('code-view');
-const toastLoader = document.getElementById('toast-loader');
 const appContainer = document.getElementById('app-container');
 const downloadBtn = document.getElementById('download-btn');
 const chatHistoryContainer = document.getElementById('chat-history');
 const limitDisplay = document.getElementById('daily-limit-display');
-
 const studioLoader = document.getElementById('studio-loader');
 const studioLoaderText = document.getElementById('studio-loader-text');
-const appFavicon = document.getElementById('app-favicon'); // Favicon logic
+const appFavicon = document.getElementById('app-favicon');
 
 let currentGeneratedHtml = ''; 
 let loaderTimer;
@@ -47,9 +44,12 @@ let currentProjectId = null;
 let isCodeViewActive = false;
 let errorCount = 0;
 
+// Queue State
+let isGenerating = false;
+const promptQueue = [];
+
 const MAX_DAILY_REQUESTS = 500; 
 
-// EXACT CUSTOM LOADING SEQUENCE
 const loadingSequence = [
     { text: "Understanding the task...", gif: "1.gif", time: 2000 },
     { text: "Making the first draft...", gif: "3.gif", time: 3000 },
@@ -57,17 +57,10 @@ const loadingSequence = [
     { text: "Finishing up...", gif: "2.gif", time: 60000 } 
 ];
 
-const studioMessages = [
-    "Preparing your codespace...",
-    "Curating your tool library...",
-    "Finishing up..."
-];
-
-// SVGs for Chat Status
+const studioMessages = ["Preparing your codespace...", "Curating your tool library...", "Finishing up..."];
 const successSvg = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
 const errorSvg = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
 
-// --- Daily Limit Logic ---
 function initDailyLimit() {
     const today = new Date().toDateString();
     let usage = JSON.parse(localStorage.getItem('visualiser_usage') || '{}');
@@ -99,7 +92,20 @@ function canGenerate() {
 }
 initDailyLimit();
 
-// --- Configuration & Actions ---
+function updateGenerateButtonState(isQueueing) {
+    if (isQueueing) {
+        generateBtn.innerHTML = `
+            Queue
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        `;
+    } else {
+        generateBtn.innerHTML = `
+            Enter
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 10 4 15 9 20"></polyline><path d="M20 4v7a4 4 0 0 1-4 4H4"></path></svg>
+        `;
+    }
+}
+
 configBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         const currentKey = localStorage.getItem('gemini_api_key') || '';
@@ -138,15 +144,17 @@ downloadBtn.addEventListener('click', () => {
     URL.revokeObjectURL(url);
 });
 
-// GitHub Redirection 
 if (githubBtn) {
     githubBtn.addEventListener('click', () => {
+        if (!currentProjectId) { alert("Please save your project in the Studio first before publishing."); return; }
+        
+        localStorage.setItem('visualiser_current_project_id', currentProjectId);
+        
         if (currentGeneratedHtml) localStorage.setItem('visualiser_pending_gh', currentGeneratedHtml);
         window.location.href = '/gh';
     });
 }
 
-// New Project Button Logic
 newProjectBtn.addEventListener('click', () => {
     isFirstGeneration = true;
     currentProjectId = null;
@@ -158,11 +166,12 @@ newProjectBtn.addEventListener('click', () => {
     appContainer.className = 'view-home';
     studioBtnText.innerText = 'Open in Studio';
     studioBtnIcon.style.display = 'none';
+    promptQueue.length = 0; 
+    isGenerating = false;
+    updateGenerateButtonState(false);
     clearConsole();
     
-    // Favicon reset
     if (appFavicon) appFavicon.href = '/favicon.png';
-    
     if (isCodeViewActive) {
         isCodeViewActive = false;
         previewFrame.style.display = 'block';
@@ -202,20 +211,10 @@ fullscreenBtn.addEventListener('click', () => {
     }
 });
 
-document.addEventListener('fullscreenchange', () => {
-    if (document.fullscreenElement) {
-        fullscreenBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18h-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path></svg>`;
-    } else {
-        fullscreenBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>`;
-    }
-});
-
-// --- Console Logic ---
 consoleToggleBtn.addEventListener('click', () => {
     consoleDrawer.classList.toggle('open');
     if (consoleDrawer.classList.contains('open')) {
         consoleToggleBtn.classList.add('active');
-        // Hide badge when opened
         const badge = consoleToggleBtn.querySelector('.error-badge');
         if (badge) badge.style.display = 'none';
     } else {
@@ -239,7 +238,6 @@ function addConsoleError(msg) {
     if (errorCount === 0) consoleLogs.innerHTML = ''; 
     errorCount++;
     
-    // Create red dot badge
     let badge = consoleToggleBtn.querySelector('.error-badge');
     if (!badge) {
         badge = document.createElement('span');
@@ -270,7 +268,6 @@ function addConsoleError(msg) {
     badge.style.display = 'none';
 }
 
-// Iframe Error Listener
 window.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'studio-iframe-error') {
         addConsoleError(event.data.message);
@@ -294,9 +291,7 @@ function injectErrorCatcher(html) {
         };
     </script>`;
     
-    if (html.includes('<head>')) {
-        return html.replace('<head>', '<head>' + errorScript);
-    }
+    if (html.includes('<head>')) return html.replace('<head>', '<head>' + errorScript);
     return errorScript + html;
 }
 
@@ -331,8 +326,6 @@ async function explainError(errorMsg) {
     chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
 }
 
-
-// --- Projects (Studio Mode) Logic ---
 projectsBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         renderProjectsList();
@@ -359,8 +352,6 @@ studioBtn.addEventListener('click', async () => {
         clearInterval(studioInterval);
         studioLoader.style.display = 'none';
         appContainer.className = 'view-studio';
-        
-        // Dynamic Favicon Update
         if (appFavicon) appFavicon.href = '/studio_favicon.png';
     }
 
@@ -438,13 +429,17 @@ function loadProject(id) {
     });
 
     clearConsole();
+    promptQueue.length = 0;
+    isGenerating = false;
+    updateGenerateButtonState(false);
+    
     previewFrame.srcdoc = injectErrorCatcher(currentGeneratedHtml);
     appContainer.className = 'view-studio';
     isFirstGeneration = false;
     projectsModal.style.display = 'none';
-    
-    // Dynamic Favicon Update
     if (appFavicon) appFavicon.href = '/studio_favicon.png';
+    
+    if (typeof initRepoView === 'function') initRepoView();
     
     studioBtnIcon.style.display = 'inline-block';
     studioBtnIcon.innerHTML = `<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline>`;
@@ -458,26 +453,26 @@ function loadProject(id) {
     setTimeout(() => { chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight; }, 50);
 }
 
-// --- Loader Management ---
+function setLiveSubtaskText(text) {
+    const initSub = document.getElementById('initial-loader-subtext');
+    if (initSub) initSub.innerText = text;
+    
+    const chatSub = document.getElementById('chat-loading-subtext');
+    if (chatSub) chatSub.innerText = text;
+}
+
 function updateLoaderUI(stepData) {
     const gifPath = `/load/${stepData.gif}`;
+    
     const initGif = document.getElementById('initial-loader-gif');
     const initText = document.getElementById('initial-loader-text');
     if (initGif) initGif.src = gifPath;
     if (initText) initText.innerText = stepData.text;
-    
-    const toastLoader = document.getElementById('toast-loader');
-    if (toastLoader) {
-        const toastImg = toastLoader.querySelector('img');
-        const toastSpan = toastLoader.querySelector('span');
-        if (toastImg) toastImg.src = gifPath;
-        if (toastSpan) toastSpan.innerText = stepData.text;
-    }
-    
-    const chatText = document.getElementById('chat-loading-text');
+
     const chatImg = document.querySelector('#chat-loading-bubble img');
-    if (chatText) chatText.innerText = stepData.text;
+    const chatText = document.getElementById('chat-loading-text');
     if (chatImg) chatImg.src = gifPath;
+    if (chatText) chatText.innerText = stepData.text;
 }
 
 function processLoadingSequence() {
@@ -493,30 +488,34 @@ function processLoadingSequence() {
 }
 
 function startInitialLoading() {
-    generateBtn.disabled = true;
     appContainer.className = 'view-loading';
+    setLiveSubtaskText('');
     currentLoadingStep = 0;
     processLoadingSequence();
 }
 
 function startRevisionLoading() {
-    generateBtn.disabled = true;
-    toastLoader.style.display = 'flex';
+    setLiveSubtaskText('');
+    
     const tempLoadingBubble = document.createElement('div');
     tempLoadingBubble.id = 'chat-loading-bubble';
     tempLoadingBubble.classList.add('chat-bubble', 'loading-bubble');
-    tempLoadingBubble.innerHTML = `<img class="mini-gif dark-mode-gif" src=""> <span id="chat-loading-text"></span>`;
+    tempLoadingBubble.innerHTML = `
+        <img class="mini-gif dark-mode-gif" src=""> 
+        <div class="loading-text-col">
+            <span id="chat-loading-text"></span>
+            <span id="chat-loading-subtext" class="loader-subtext"></span>
+        </div>`;
     chatHistoryContainer.appendChild(tempLoadingBubble);
     chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
+    
     currentLoadingStep = 0;
     processLoadingSequence();
 }
 
 function stopLoading() {
-    generateBtn.disabled = false;
     clearTimeout(loaderTimer);
     if (!isFirstGeneration) {
-        toastLoader.style.display = 'none';
         const tempBubble = document.getElementById('chat-loading-bubble');
         if (tempBubble) tempBubble.remove();
     }
@@ -537,8 +536,7 @@ function addChatBubble(text, isUser, type = 'normal') {
     chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
 }
 
-// --- Generation Loop ---
-generateBtn.addEventListener('click', async () => {
+generateBtn.addEventListener('click', () => {
     const apiKey = localStorage.getItem('gemini_api_key');
     if (!apiKey) { alert('You need to set your API key first!'); return; }
     if (!canGenerate()) { alert('Limit reached! Check back tomorrow.'); return; }
@@ -546,7 +544,7 @@ generateBtn.addEventListener('click', async () => {
     const userPrompt = promptInput.value.trim();
     if (!userPrompt) return;
 
-    if (isFirstGeneration) {
+    if (isFirstGeneration && promptQueue.length === 0 && !isGenerating) {
         currentProjectId = null;
         studioBtnText.innerText = 'Open in Studio';
         studioBtnIcon.style.display = 'none';
@@ -556,7 +554,18 @@ generateBtn.addEventListener('click', async () => {
     promptInput.value = ''; 
     clearConsole();
 
-    // The magical husxjfw-crash trigger
+    promptQueue.push(userPrompt);
+    processQueue();
+});
+
+async function processQueue() {
+    if (isGenerating || promptQueue.length === 0) return;
+    
+    isGenerating = true;
+    updateGenerateButtonState(true);
+    
+    const userPrompt = promptQueue.shift();
+
     if (userPrompt === 'husxjfw-crash') {
         if (isFirstGeneration) startInitialLoading(); else startRevisionLoading();
         
@@ -573,6 +582,10 @@ generateBtn.addEventListener('click', async () => {
             addChatBubble("Visual updated.", false, 'success');
             incrementUsage();
             stopLoading();
+            
+            isGenerating = false;
+            if (promptQueue.length === 0) updateGenerateButtonState(false);
+            processQueue();
         }, 3000);
         return;
     }
@@ -589,7 +602,8 @@ generateBtn.addEventListener('click', async () => {
     }
 
     try {
-        const generatedHtml = await callGeminiAPI(apiKey);
+        const apiResponse = await callGeminiAPI(localStorage.getItem('gemini_api_key'));
+        const generatedHtml = apiResponse.code;
         
         if (isFirstGeneration) {
             appContainer.className = 'view-workspace';
@@ -597,7 +611,7 @@ generateBtn.addEventListener('click', async () => {
             setTimeout(() => { chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight; }, 50);
         }
         
-        conversationHistory.push({ role: "model", parts: [{ text: generatedHtml }] });
+        conversationHistory.push({ role: "model", parts: [{ text: apiResponse.rawText }] });
         addChatBubble("Visual updated.", false, 'success');
         incrementUsage();
         
@@ -611,15 +625,26 @@ generateBtn.addEventListener('click', async () => {
         if (isFirstGeneration) appContainer.className = 'view-home';
     } finally {
         stopLoading();
+        isGenerating = false;
+        if (promptQueue.length === 0) updateGenerateButtonState(false);
+        processQueue(); 
     }
-});
+}
 
-// --- API Call ---
 async function callGeminiAPI(apiKey) {
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`;
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:streamGenerateContent?alt=sse&key=${apiKey}`;
+    
     const systemInstruction = `You are an expert web developer. The user wants a web-based visualiser, graph, or interactive element. 
 Write a single, self-contained HTML file containing all necessary CSS and JS inline. Use public CDN links (like Chart.js or D3) if required. 
-OUTPUT ONLY RAW HTML. DO NOT WRAP IN MARKDOWN CODE BLOCKS (no \`\`\`html).`;
+
+You must output your response in three exact phases using these tags:
+1. {task="Short, grammatically correct task description"}
+2. [thinking: your detailed internal reasoning]
+3. <code_output>
+the raw html/css/js code
+</code_output>
+
+CRITICAL: You MUST use the {task="..."} and [thinking: ...] tags AT LEAST 3 times before outputting the final code to show your step-by-step progress. Ensure the task descriptions have correct grammar (e.g., "Drafting the basic layout..."). ALWAYS wrap the final code in <code_output> and </code_output> and DO NOT use markdown code blocks.`;
 
     const response = await fetch(endpoint, {
         method: 'POST',
@@ -646,9 +671,58 @@ OUTPUT ONLY RAW HTML. DO NOT WRAP IN MARKDOWN CODE BLOCKS (no \`\`\`html).`;
         throw new Error(errMsg);
     }
 
-    const data = await response.json();
-    let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!rawText) throw new Error('No content returned from Gemini.');
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let buffer = '';
+    let fullText = '';
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split(/\r?\n/);
+        buffer = lines.pop(); 
+        
+        for (const line of lines) {
+            if (line.startsWith('data: ')) {
+                const dataStr = line.slice(6);
+                if (dataStr === '[DONE]') continue;
+                try {
+                    const data = JSON.parse(dataStr);
+                    const textChunk = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                    fullText += textChunk;
+                    
+                    const tasks = [...fullText.matchAll(/\{task="([^"]+)"\}/g)];
+                    if (tasks.length > 0) {
+                        setLiveSubtaskText(tasks[tasks.length - 1][1]);
+                    }
+                } catch(e) {}
+            }
+        }
+    }
+
+    if (!fullText) throw new Error('No content returned from Gemini.');
     
-    return rawText.replace(/^```html\s*/i, '').replace(/```\s*$/, '').trim();
+    let code = fullText;
+    const codeStart = fullText.indexOf('<code_output>');
+    if (codeStart !== -1) {
+        let codeEnd = fullText.lastIndexOf('</code_output>');
+        if (codeEnd === -1) codeEnd = fullText.length;
+        code = fullText.substring(codeStart + 13, codeEnd).trim();
+    } else {
+        code = fullText.replace(/^\s*```html\s*/i, '').replace(/```\s*$/, '').trim();
+    }
+
+    return { code, rawText: fullText };
 }
+
+// Auto-load project from URL if returning from GitHub
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const loadPid = urlParams.get('load');
+    if (loadPid) {
+        setTimeout(() => loadProject(loadPid), 100);
+        window.history.replaceState({}, document.title, '/');
+    }
+});

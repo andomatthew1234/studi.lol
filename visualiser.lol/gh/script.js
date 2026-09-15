@@ -3,6 +3,14 @@ const navItems = document.querySelectorAll('.nav-item:not(.disabled)');
 const views = document.querySelectorAll('.view-section');
 const backBtn = document.getElementById('back-btn');
 
+// Account Elements
+const splashState = document.getElementById('account-splash-state');
+const wizardState = document.getElementById('account-wizard-state');
+const dashboardState = document.getElementById('account-dashboard-state');
+const btnStartSignin = document.getElementById('btn-start-signin');
+const btnCancelSignin = document.getElementById('cancel-signin-btn');
+const btnLogout = document.getElementById('btn-logout');
+
 // Wizard Elements
 const wizardSteps = document.querySelectorAll('.wizard-step');
 const progressBar = document.getElementById('progress-bar');
@@ -10,10 +18,10 @@ const btnNext = document.getElementById('wizard-next');
 const btnPrev = document.getElementById('wizard-prev');
 const wizardTokenInput = document.getElementById('wizard-token');
 const saveTokenBtn = document.getElementById('save-token-btn');
+const validationError = document.getElementById('validation-error');
 
 // Gist Elements
 const gistForm = document.getElementById('gist-form');
-const ghTokenInput = document.getElementById('gh-token');
 const descInput = document.getElementById('gist-desc');
 const publicToggle = document.getElementById('gist-public');
 const gistPublishBtn = document.getElementById('gist-publish-btn');
@@ -27,7 +35,6 @@ const viewGistBtn = document.getElementById('view-gist-btn');
 const repoPromptState = document.getElementById('repo-prompt-state');
 const repoCreateState = document.getElementById('repo-create-state');
 const repoActiveState = document.getElementById('repo-active-state');
-
 const btnShowCreate = document.getElementById('btn-show-create');
 const btnCancelCreate = document.getElementById('btn-cancel-create');
 const btnDoCreate = document.getElementById('btn-do-create');
@@ -67,8 +74,12 @@ let readmeEditorInstance = null;
 let isPagesEnabled = false;
 let repoDefaultBranch = 'main';
 
+// Dynamically link repo to the Studio Project
+const currentProjectId = localStorage.getItem('visualiser_current_project_id');
+const repoStorageKey = currentProjectId ? `visualiser_linked_repo_${currentProjectId}` : 'visualiser_linked_repo';
+
 // --- Initialization ---
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     htmlPayload = localStorage.getItem('visualiser_pending_gh');
     
     if (!htmlPayload || htmlPayload.trim() === '') {
@@ -78,31 +89,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const savedToken = localStorage.getItem('visualiser_github_pat');
     if (savedToken) {
-        ghTokenInput.value = savedToken;
         wizardTokenInput.value = savedToken;
+        await validateAndLoadDashboard(savedToken);
+    } else {
+        showSplash();
     }
     
     updateWizardUI();
     initRepoView();
 });
 
-// --- Helper: Fetch GitHub Username ---
-async function fetchGithubUsername(token) {
-    const cached = localStorage.getItem('visualiser_gh_username');
-    if (cached) return cached;
-
-    const res = await fetch('https://api.github.com/user', {
-        headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (!res.ok) throw new Error('Failed to get GitHub username. Check token.');
-    const data = await res.json();
-    localStorage.setItem('visualiser_gh_username', data.login);
-    return data.login;
-}
-
 // --- Navigation ---
 backBtn.addEventListener('click', () => {
-    window.location.href = '/';
+    if (currentProjectId) {
+        window.location.href = '/?load=' + currentProjectId;
+    } else {
+        window.location.href = '/';
+    }
 });
 
 navItems.forEach(item => {
@@ -116,22 +119,97 @@ navItems.forEach(item => {
     });
 });
 
-// --- Copy Buttons ---
 document.querySelectorAll('.copy-action').forEach(btn => {
     btn.addEventListener('click', () => {
         const targetId = btn.getAttribute('data-target');
         const inputToCopy = document.getElementById(targetId);
-        
         inputToCopy.select();
         document.execCommand('copy');
-        
         const originalText = btn.innerText;
         btn.innerText = 'Copied!';
         setTimeout(() => btn.innerText = originalText, 2000);
     });
 });
 
-// --- Wizard Logic ---
+// --- Account / PAT Logic ---
+function showSplash() {
+    splashState.style.display = 'flex';
+    wizardState.style.display = 'none';
+    dashboardState.style.display = 'none';
+}
+
+function showWizard() {
+    splashState.style.display = 'none';
+    wizardState.style.display = 'block';
+    dashboardState.style.display = 'none';
+}
+
+async function validateAndLoadDashboard(token) {
+    loaderText.innerText = "Connecting to GitHub...";
+    loader.style.display = 'flex';
+    
+    try {
+        const res = await fetch('https://api.github.com/user', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!res.ok) {
+            localStorage.removeItem('visualiser_github_pat');
+            throw new Error("Token expired or invalid.");
+        }
+
+        // Verify strict scopes if it's a new validation
+        const scopes = res.headers.get('x-oauth-scopes') || "";
+        const required = ['repo', 'gist', 'delete_repo'];
+        const missing = required.filter(s => !scopes.includes(s));
+        
+        if (missing.length > 0 && !scopes.includes('user')) { // allow if full access
+            throw new Error(`Your PAT is missing required permissions: ${missing.join(', ')}. Please create a new one with all boxes checked.`);
+        }
+
+        const userData = await res.json();
+        
+        // Cache username
+        localStorage.setItem('visualiser_gh_username', userData.login);
+        
+        // Populate Dashboard
+        document.getElementById('gh-avatar').src = userData.avatar_url;
+        document.getElementById('gh-name').innerText = userData.name || userData.login;
+        document.getElementById('gh-handle').innerText = '@' + userData.login;
+        document.getElementById('gh-handle').href = userData.html_url;
+        document.getElementById('gh-bio').innerText = userData.bio || "No bio set.";
+        document.getElementById('gh-repos').innerText = userData.public_repos;
+        document.getElementById('gh-gists').innerText = userData.public_gists;
+        document.getElementById('gh-followers').innerText = userData.followers;
+        
+        splashState.style.display = 'none';
+        wizardState.style.display = 'none';
+        dashboardState.style.display = 'block';
+        
+    } catch (err) {
+        showSplash();
+        validationError.innerText = err.message;
+        validationError.style.display = 'block';
+        if (wizardState.style.display === 'block') {
+            showWizard(); // Keep them in the wizard to fix it
+        }
+    } finally {
+        loader.style.display = 'none';
+    }
+}
+
+btnStartSignin.addEventListener('click', showWizard);
+btnCancelSignin.addEventListener('click', showSplash);
+
+btnLogout.addEventListener('click', () => {
+    localStorage.removeItem('visualiser_github_pat');
+    localStorage.removeItem('visualiser_gh_username');
+    wizardTokenInput.value = '';
+    currentStep = 1;
+    updateWizardUI();
+    showSplash();
+});
+
 function updateWizardUI() {
     const progress = ((currentStep) / totalSteps) * 100;
     progressBar.style.width = `${progress}%`;
@@ -146,27 +224,34 @@ function updateWizardUI() {
 }
 
 btnNext.addEventListener('click', () => {
-    if (currentStep < totalSteps) {
-        currentStep++;
-        updateWizardUI();
-    }
+    if (currentStep < totalSteps) { currentStep++; updateWizardUI(); }
 });
-
 btnPrev.addEventListener('click', () => {
-    if (currentStep > 1) {
-        currentStep--;
-        updateWizardUI();
+    if (currentStep > 1) { currentStep--; updateWizardUI(); }
+});
+
+saveTokenBtn.addEventListener('click', async () => {
+    const token = wizardTokenInput.value.trim();
+    validationError.style.display = 'none';
+    
+    if (!token) {
+        validationError.innerText = "Please paste a token first.";
+        validationError.style.display = 'block';
+        return;
+    }
+    
+    saveTokenBtn.disabled = true;
+    try {
+        await validateAndLoadDashboard(token);
+        // If successful, dashboard takes over. Only save locally on success.
+        if (dashboardState.style.display === 'block') {
+            localStorage.setItem('visualiser_github_pat', token);
+        }
+    } finally {
+        saveTokenBtn.disabled = false;
     }
 });
 
-saveTokenBtn.addEventListener('click', () => {
-    const token = wizardTokenInput.value.trim();
-    if (token) {
-        localStorage.setItem('visualiser_github_pat', token);
-        ghTokenInput.value = token;
-    }
-    document.querySelector('[data-target="view-gist"]').click();
-});
 
 // --- Gist Execution ---
 gistForm.addEventListener('submit', async (e) => {
@@ -175,12 +260,14 @@ gistForm.addEventListener('submit', async (e) => {
     
     if (!htmlPayload) return;
 
-    const token = ghTokenInput.value.trim();
+    const token = localStorage.getItem('visualiser_github_pat');
+    if (!token) {
+        gistErrorMsg.innerText = 'Please sign in from the Account tab first.';
+        return;
+    }
+
     const description = descInput.value.trim();
     const isPublic = publicToggle.checked;
-
-    if (!token) return;
-    localStorage.setItem('visualiser_github_pat', token);
 
     const apiPayload = {
         description: description,
@@ -203,17 +290,9 @@ gistForm.addEventListener('submit', async (e) => {
             body: JSON.stringify(apiPayload)
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            if (response.status === 404 || response.status === 403) {
-                throw new Error('Permission denied. Ensure your PAT has the "gist" scope checked.');
-            }
-            if (response.status === 401) throw new Error('Invalid token.');
-            throw new Error(errorData.message || 'Failed to create Gist.');
-        }
+        if (!response.ok) throw new Error('Failed to create Gist.');
 
         const data = await response.json();
-        
         gistForm.style.display = 'none';
         gistSuccessState.style.display = 'flex';
         gistLinkInput.value = data.html_url;
@@ -228,10 +307,16 @@ gistForm.addEventListener('submit', async (e) => {
     }
 });
 
-// --- Repository Logic ---
 
+// --- Repository Logic ---
 function initRepoView() {
-    const activeRepo = localStorage.getItem('visualiser_linked_repo');
+    if (!currentProjectId) {
+        repoPromptState.style.display = 'flex';
+        repoPromptState.innerHTML = `<h3>Action Required</h3><p>Please open or save a project in Studio before managing repositories.</p>`;
+        return;
+    }
+
+    const activeRepo = localStorage.getItem(repoStorageKey);
     
     if (activeRepo) {
         showRepoActiveUI(activeRepo);
@@ -254,7 +339,6 @@ async function showRepoActiveUI(repoName) {
     await checkPagesStatus(repoName);
 }
 
-// Format enforcing for repo name
 newRepoNameInput.addEventListener('input', () => {
     newRepoNameInput.value = newRepoNameInput.value.replace(/[^a-zA-Z0-9_\.-]/g, '');
 });
@@ -268,23 +352,15 @@ btnShowCreate.addEventListener('click', () => {
     repoCreateState.style.display = 'flex';
 });
 
-btnCancelCreate.addEventListener('click', () => {
-    initRepoView();
-});
+btnCancelCreate.addEventListener('click', initRepoView);
 
 btnDoCreate.addEventListener('click', async () => {
     repoCreateError.innerText = '';
     const repoName = newRepoNameInput.value.trim();
     const token = localStorage.getItem('visualiser_github_pat');
     
-    if (!repoName) {
-        repoCreateError.innerText = "Please enter a valid name.";
-        return;
-    }
-    if (!token) {
-        repoCreateError.innerText = "No GitHub token found. Complete the Configuration step first.";
-        return;
-    }
+    if (!repoName) { repoCreateError.innerText = "Please enter a valid name."; return; }
+    if (!token) { repoCreateError.innerText = "Sign in via Account tab first."; return; }
 
     loaderText.innerText = "Creating repository...";
     loader.style.display = 'flex';
@@ -301,10 +377,10 @@ btnDoCreate.addEventListener('click', async () => {
         
         if (!createRes.ok) {
             const err = await createRes.json();
-            throw new Error(err.message || 'Failed to create repository. Check "repo" scope.');
+            throw new Error(err.message || 'Failed to create repository.');
         }
 
-        localStorage.setItem('visualiser_linked_repo', repoName);
+        localStorage.setItem(repoStorageKey, repoName);
         showRepoActiveUI(repoName);
 
     } catch (err) {
@@ -314,7 +390,6 @@ btnDoCreate.addEventListener('click', async () => {
     }
 });
 
-// Tab Switching
 ghTabs.forEach(tab => {
     tab.addEventListener('click', () => {
         ghTabs.forEach(t => t.classList.remove('active'));
@@ -327,14 +402,13 @@ ghTabs.forEach(tab => {
 });
 
 // --- GitHub Pages Management ---
-async function checkPagesStatus(repoName) {
+async function checkPagesStatus(repoName, isPolling = false) {
     const token = localStorage.getItem('visualiser_github_pat');
-    if (!token) return;
+    if (!token) return false;
 
     try {
-        const username = await fetchGithubUsername(token);
+        const username = localStorage.getItem('visualiser_gh_username');
         
-        // 1. Get repo default branch
         const repoRes = await fetch(`https://api.github.com/repos/${username}/${repoName}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -344,7 +418,6 @@ async function checkPagesStatus(repoName) {
             isPagesEnabled = repoData.has_pages;
         }
 
-        // 2. Fetch pages info if enabled
         if (isPagesEnabled) {
             const pagesRes = await fetch(`https://api.github.com/repos/${username}/${repoName}/pages`, {
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -356,23 +429,26 @@ async function checkPagesStatus(repoName) {
                 pagesVisitBtn.href = pagesData.html_url;
                 pagesUrlGroup.style.display = 'block';
                 pagesStatusText.innerText = "GitHub Pages Enabled";
+                return true;
             }
         } else {
-            pagesToggle.checked = false;
-            pagesUrlGroup.style.display = 'none';
-            pagesStatusText.innerText = "Enable GitHub Pages";
+            if (!isPolling) {
+                pagesToggle.checked = false;
+                pagesUrlGroup.style.display = 'none';
+                pagesStatusText.innerText = "Enable GitHub Pages";
+            }
+            return false;
         }
-    } catch(e) {
-        console.error("Failed to fetch pages status:", e);
-    }
+    } catch(e) { console.error("Failed to fetch pages status:", e); }
+    return false;
 }
 
 pagesToggle.addEventListener('change', async () => {
     const token = localStorage.getItem('visualiser_github_pat');
-    const repoName = localStorage.getItem('visualiser_linked_repo');
+    const repoName = localStorage.getItem(repoStorageKey);
     if (!token || !repoName) return;
 
-    const username = await fetchGithubUsername(token);
+    const username = localStorage.getItem('visualiser_gh_username');
     pagesToggle.disabled = true;
 
     try {
@@ -385,12 +461,7 @@ pagesToggle.addEventListener('change', async () => {
                     'Content-Type': 'application/json',
                     'Accept': 'application/vnd.github+json'
                 },
-                body: JSON.stringify({
-                    source: {
-                        branch: repoDefaultBranch,
-                        path: "/"
-                    }
-                })
+                body: JSON.stringify({ source: { branch: repoDefaultBranch, path: "/" } })
             });
 
             if (!res.ok) {
@@ -398,10 +469,19 @@ pagesToggle.addEventListener('change', async () => {
                 if (err.message && err.message.includes('not found')) {
                     throw new Error("GitHub rejected it: You need to publish at least one commit to the repo first before enabling Pages!");
                 }
-                throw new Error(err.message || "Failed to enable pages (Unknown GitHub API Error).");
+                throw new Error(err.message || "Failed to enable pages.");
             }
             
-            setTimeout(() => checkPagesStatus(repoName), 2000);
+            pagesStatusText.innerText = "Syncing with GitHub...";
+            let attempts = 0;
+            const poll = setInterval(async () => {
+                attempts++;
+                const ready = await checkPagesStatus(repoName, true);
+                if (ready || attempts > 10) {
+                    clearInterval(poll);
+                    if (!ready) pagesStatusText.innerText = "Enabled, but taking a while to sync. Reload later.";
+                }
+            }, 3000);
             
         } else {
             pagesStatusText.innerText = "Disabling...";
@@ -412,10 +492,7 @@ pagesToggle.addEventListener('change', async () => {
                     'Accept': 'application/vnd.github+json'
                 }
             });
-            if (!res.ok) {
-                const err = await res.json().catch(() => ({}));
-                throw new Error(err.message || "Failed to disable pages.");
-            }
+            if (!res.ok) throw new Error("Failed to disable pages.");
             
             isPagesEnabled = false;
             pagesUrlGroup.style.display = 'none';
@@ -432,9 +509,7 @@ pagesToggle.addEventListener('change', async () => {
 
 async function pollForPagesDeployment(owner, repo, sha, token) {
     let attempts = 0;
-    const maxAttempts = 30; // Max 2 minutes waiting
-
-    while (attempts < maxAttempts) {
+    while (attempts < 30) {
         attempts++;
         await new Promise(resolve => setTimeout(resolve, 4000));
         try {
@@ -442,21 +517,14 @@ async function pollForPagesDeployment(owner, repo, sha, token) {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!res.ok) continue;
-            
             const data = await res.json();
-            // Look for any workflow containing 'pages' in the readable name
             const pageRun = data.workflow_runs.find(r => r.name.toLowerCase().includes('pages'));
-            
-            if (pageRun && pageRun.status === 'completed') {
-                return; // Reached end state
-            }
-        } catch (e) {
-            console.error("Polling error", e);
-        }
+            if (pageRun && pageRun.status === 'completed') return; 
+        } catch (e) {}
     }
 }
 
-// --- Commit Publishing (index.html) ---
+// --- Commit Publishing ---
 repoPublishForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     repoPublishError.innerText = '';
@@ -466,7 +534,7 @@ repoPublishForm.addEventListener('submit', async (e) => {
         return;
     }
 
-    const repoName = localStorage.getItem('visualiser_linked_repo');
+    const repoName = localStorage.getItem(repoStorageKey);
     const token = localStorage.getItem('visualiser_github_pat');
     const message = commitMsgInput.value.trim();
 
@@ -475,7 +543,7 @@ repoPublishForm.addEventListener('submit', async (e) => {
     loader.style.display = 'flex';
 
     try {
-        const username = await fetchGithubUsername(token);
+        const username = localStorage.getItem('visualiser_gh_username');
 
         let fileSha = null;
         const shaRes = await fetch(`https://api.github.com/repos/${username}/${repoName}/contents/index.html`, {
@@ -501,14 +569,12 @@ repoPublishForm.addEventListener('submit', async (e) => {
         
         loader.style.display = 'none';
 
-        // Check if Pages is enabled to trigger overlay
         if (isPagesEnabled) {
             pagesLoader.style.display = 'flex';
             await pollForPagesDeployment(username, repoName, putData.commit.sha, token);
             pagesLoader.style.display = 'none';
         }
 
-        // Success
         saveTimeline(repoName, message, putData.commit.html_url);
         loadRepoTimeline(repoName);
         
@@ -529,7 +595,7 @@ async function loadReadme(repoName) {
     if (!token) return;
 
     try {
-        const username = await fetchGithubUsername(token);
+        const username = localStorage.getItem('visualiser_gh_username');
         const res = await fetch(`https://api.github.com/repos/${username}/${repoName}/readme`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -552,9 +618,7 @@ async function loadReadme(repoName) {
         } else {
             readmeEditorInstance.setMarkdown(content);
         }
-    } catch(e) {
-        console.error("Error loading readme:", e);
-    }
+    } catch(e) {}
 }
 
 document.getElementById('btn-save-readme').addEventListener('click', async () => {
@@ -564,14 +628,14 @@ document.getElementById('btn-save-readme').addEventListener('click', async () =>
     
     try {
         const token = localStorage.getItem('visualiser_github_pat');
-        const repoName = localStorage.getItem('visualiser_linked_repo');
+        const repoName = localStorage.getItem(repoStorageKey);
         
         if (!readmeEditorInstance || !token || !repoName) return;
 
         const markdown = readmeEditorInstance.getMarkdown();
         const contentBase64 = btoa(unescape(encodeURIComponent(markdown)));
         
-        const username = await fetchGithubUsername(token);
+        const username = localStorage.getItem('visualiser_gh_username');
         
         let fileSha = null;
         const shaRes = await fetch(`https://api.github.com/repos/${username}/${repoName}/contents/README.md`, {
@@ -646,7 +710,7 @@ function saveTimeline(repoName, message, url) {
 
 // --- Delete Repo ---
 btnDeleteRepo.addEventListener('click', async () => {
-    const repoName = localStorage.getItem('visualiser_linked_repo');
+    const repoName = localStorage.getItem(repoStorageKey);
     const token = localStorage.getItem('visualiser_github_pat');
     
     if (!confirm(`Are you sure you want to permanently delete "${repoName}" from GitHub?`)) return;
@@ -655,7 +719,7 @@ btnDeleteRepo.addEventListener('click', async () => {
     loader.style.display = 'flex';
 
     try {
-        const username = await fetchGithubUsername(token);
+        const username = localStorage.getItem('visualiser_gh_username');
 
         const delRes = await fetch(`https://api.github.com/repos/${username}/${repoName}`, {
             method: 'DELETE',
@@ -664,10 +728,10 @@ btnDeleteRepo.addEventListener('click', async () => {
 
         if (!delRes.ok) {
             const err = await delRes.json();
-            throw new Error(err.message || "Failed to delete repository. Check 'delete_repo' scope.");
+            throw new Error(err.message || "Failed to delete repository.");
         }
 
-        localStorage.removeItem('visualiser_linked_repo');
+        localStorage.removeItem(repoStorageKey);
         const repos = JSON.parse(localStorage.getItem('visualiser_gh_repos') || '{}');
         delete repos[repoName];
         localStorage.setItem('visualiser_gh_repos', JSON.stringify(repos));

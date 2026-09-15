@@ -27,9 +27,9 @@
             </div>
 
             <nav class="sidebar-nav">
-                <button class="nav-item active" data-target="view-config">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                    Configuration
+                <button class="nav-item active" data-target="view-account">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    Account
                 </button>
                 <button class="nav-item" data-target="view-gist">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
@@ -51,62 +51,125 @@
         <!-- Main Content Area -->
         <main class="gh-content">
             
-            <!-- View: Configuration -->
-            <section id="view-config" class="view-section active">
-                <div class="content-header">
-                    <h2>Setup GitHub Access</h2>
-                    <p class="text-muted">Follow these steps to generate a Personal Access Token.</p>
+            <!-- View: Account -->
+            <section id="view-account" class="view-section active">
+                
+                <!-- State 1: Logged Out Splash -->
+                <div id="account-splash-state" class="card center-splash">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor" style="margin-bottom: 1rem;"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                    <h2>Sign in with GitHub to continue</h2>
+                    <p class="text-muted" style="margin-top: 0.5rem; max-width: 450px; line-height: 1.5;">To use features like GitHub repositories, gists, and even live websites, sign in with your GitHub account. Don't worry, it will only take 30 seconds.</p>
+                    <button id="btn-start-signin" class="primary-btn" style="margin-top: 2rem; width: auto;">Sign In</button>
                 </div>
-                <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
-                <div class="wizard-container card">
-                    <div class="wizard-step active" id="step-1">
-                        <h3>Step 1: Go to the website</h3>
-                        <p>Select the button below to open the GitHub tokens page.</p>
-                        <a href="https://github.com/settings/tokens/new" target="_blank" class="primary-btn outline" style="width:fit-content; margin: 1rem 0;">Open GitHub Settings</a>
-                        <div class="warning-box">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                            <span>You may need to re-sign into GitHub for security reasons.</span>
+
+                <!-- State 2: Tutorial Wizard -->
+                <div id="account-wizard-state" style="display: none;">
+                    <div class="content-header">
+                        <h2>Setup GitHub Access</h2>
+                        <p class="text-muted">Follow these steps to generate a Personal Access Token.</p>
+                    </div>
+                    <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
+                    <div class="wizard-container card">
+                        <div class="wizard-step active" id="step-1">
+                            <h3>Step 1: Go to the website</h3>
+                            <p>Select the button below to open the GitHub tokens page.</p>
+                            <a href="https://github.com/settings/tokens/new" target="_blank" class="primary-btn outline" style="width:fit-content; margin: 1rem 0;">Open GitHub Settings</a>
+                            <div class="warning-box">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                <span>You may need to re-sign into GitHub for security reasons.</span>
+                            </div>
+                            <img src="/gh/step_img/1.png" alt="GitHub login screen" class="step-img">
                         </div>
-                        <img src="/gh/step_img/1.png" alt="GitHub login screen" class="step-img">
-                    </div>
-                    <div class="wizard-step" id="step-2">
-                        <h3>Step 2: Give it a name</h3>
-                        <p>Make sure you enter a name for the PAT in the <strong>Note</strong> field so you remember what it's for.</p>
-                        <div class="copy-box">
-                            <input type="text" id="copy-note-text" value="visualiser.lol PAT" readonly>
-                            <button class="outline-btn small-btn copy-action" data-target="copy-note-text">Copy</button>
+                        <div class="wizard-step" id="step-2">
+                            <h3>Step 2: Give it a name</h3>
+                            <p>Make sure you enter a name for the PAT in the <strong>Note</strong> field so you remember what it's for.</p>
+                            <div class="copy-box">
+                                <input type="text" id="copy-note-text" value="visualiser.lol PAT" readonly>
+                                <button class="outline-btn small-btn copy-action" data-target="copy-note-text">Copy</button>
+                            </div>
+                            <img src="/gh/step_img/2.png" alt="Note field screenshot" class="step-img">
                         </div>
-                        <img src="/gh/step_img/2.png" alt="Note field screenshot" class="step-img">
-                    </div>
-                    <div class="wizard-step" id="step-3">
-                        <h3>Step 3: Add permissions</h3>
-                        <p>Check the boxes for the following permissions:</p>
-                        <ul class="permission-list">
-                            <li>repo</li><li>write:packages</li><li>gist</li><li>user</li><li>project</li><li>delete_repo</li>
-                        </ul>
-                        <div class="warning-box">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                            <span>Functions will not work as expected if you do not add these permissions. Or, as shown highlighted in the red circle in the example below.</span>
+                        <div class="wizard-step" id="step-3">
+                            <h3>Step 3: Add permissions</h3>
+                            <p>Check the boxes for the following permissions:</p>
+                            <ul class="permission-list">
+                                <li>repo</li><li>write:packages</li><li>gist</li><li>user</li><li>project</li><li>delete_repo</li>
+                            </ul>
+                            <div class="warning-box">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                <span>Functions will not work as expected if you do not add these permissions. Or, as shown highlighted in the red circle in the example below.</span>
+                            </div>
+                            <img src="/gh/step_img/3.png" alt="Permissions screenshot" class="step-img">
                         </div>
-                        <img src="/gh/step_img/3.png" alt="Permissions screenshot" class="step-img">
-                    </div>
-                    <div class="wizard-step" id="step-4">
-                        <h3>Step 4: Press create</h3>
-                        <p>Scroll to the bottom and select the big green button to create your PAT!</p>
-                        <img src="/gh/step_img/4.png" alt="Create button screenshot" class="step-img">
-                    </div>
-                    <div class="wizard-step" id="step-5">
-                        <h3>Step 5: Copy your PAT!</h3>
-                        <p>Press the Copy button on GitHub and paste your PAT in here.</p>
-                        <div class="input-group" style="margin-top: 1rem;">
-                            <label for="wizard-token">Personal Access Token</label>
-                            <input type="password" id="wizard-token" placeholder="ghp_...">
+                        <div class="wizard-step" id="step-4">
+                            <h3>Step 4: Press create</h3>
+                            <p>Scroll to the bottom and select the big green button to create your PAT!</p>
+                            <img src="/gh/step_img/4.png" alt="Create button screenshot" class="step-img">
                         </div>
-                        <button id="save-token-btn" class="primary-btn">Save & Continue</button>
+                        <div class="wizard-step" id="step-5">
+                            <h3>Step 5: Copy your PAT!</h3>
+                            <p>Press the Copy button on GitHub and paste your PAT in here.</p>
+                            <div class="input-group" style="margin-top: 1rem;">
+                                <label for="wizard-token">Personal Access Token</label>
+                                <input type="password" id="wizard-token" placeholder="ghp_...">
+                            </div>
+                            <div id="validation-error" class="error-text" style="display:none; text-align:left; margin-bottom:1rem;"></div>
+                            <div style="display:flex; gap:1rem;">
+                                <button id="save-token-btn" class="primary-btn">Validate & Save</button>
+                                <button id="cancel-signin-btn" class="outline-btn">Cancel</button>
+                            </div>
+                        </div>
+                        <div class="wizard-footer">
+                            <button id="wizard-prev" class="outline-btn" style="visibility: hidden;">Back</button>
+                            <button id="wizard-next" class="primary-btn" style="width: auto;">Next Step</button>
+                        </div>
                     </div>
-                    <div class="wizard-footer">
-                        <button id="wizard-prev" class="outline-btn" style="visibility: hidden;">Back</button>
-                        <button id="wizard-next" class="primary-btn" style="width: auto;">Next Step</button>
+                </div>
+
+                <!-- State 3: Logged In Dashboard -->
+                <div id="account-dashboard-state" style="display: none;">
+                    <div class="content-header" style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <h2>GitHub Account</h2>
+                            <p class="text-muted">You're securely connected to GitHub.</p>
+                        </div>
+                        <button id="btn-logout" class="outline-btn">Sign Out</button>
+                    </div>
+
+                    <div class="profile-card card">
+                        <div class="profile-header">
+                            <img id="gh-avatar" src="" alt="Avatar" class="avatar-lg">
+                            <div class="profile-info">
+                                <h3 id="gh-name">Loading...</h3>
+                                <a id="gh-handle" href="#" target="_blank" class="text-muted">@loading...</a>
+                            </div>
+                        </div>
+                        <p id="gh-bio" class="profile-bio" style="margin-top: 1rem; color: var(--text-main); font-size: 0.95rem;"></p>
+                        
+                        <div class="stat-grid" style="margin-top: 1.5rem;">
+                            <div class="stat-box">
+                                <span class="stat-val" id="gh-repos">-</span>
+                                <span class="stat-label">Public Repos</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-val" id="gh-gists">-</span>
+                                <span class="stat-label">Public Gists</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-val" id="gh-followers">-</span>
+                                <span class="stat-label">Followers</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="margin-top: 1.5rem;">
+                        <div class="input-group" style="margin-bottom: 0;">
+                            <label>Active Token</label>
+                            <div class="copy-box" style="opacity: 0.7;">
+                                <input type="password" id="gh-token-display" value="ghp_*******************************" readonly>
+                            </div>
+                            <p class="text-muted" style="font-size: 0.8rem; margin-top: 0.5rem;">Tokens are securely stored in your browser's local storage and only sent directly to GitHub.</p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -123,13 +186,6 @@
                         <p>No project found in memory. Generate a visual in the Studio first.</p>
                     </div>
                     <form id="gist-form">
-                        <div class="input-group">
-                            <label for="gh-token">GitHub Token</label>
-                            <div style="display:flex; gap:0.5rem;">
-                                <input type="password" id="gh-token" placeholder="ghp_..." required style="flex:1;">
-                                <button type="button" class="outline-btn" onclick="document.querySelector('[data-target=\'view-config\']').click()">Setup</button>
-                            </div>
-                        </div>
                         <div class="input-group">
                             <label for="gist-desc">Description</label>
                             <input type="text" id="gist-desc" value="Created with visualiser.lol" required>
@@ -166,7 +222,7 @@
                     <p>A repo has not been created for this project yet. Create one now?</p>
                     <div style="display:flex; gap:1rem; margin-top:1.5rem;">
                         <button id="btn-show-create" class="primary-btn">Create one</button>
-                        <button class="outline-btn" onclick="document.querySelector('[data-target=\'view-config\']').click()">Cancel</button>
+                        <button class="outline-btn" onclick="document.querySelector('[data-target=\'view-account\']').click()">Cancel</button>
                     </div>
                 </div>
 
@@ -273,7 +329,6 @@
                             </div>
                             <button id="btn-delete-repo" class="danger-btn">Delete repository</button>
                         </div>
-                        <p class="text-muted" style="margin-top: 2rem; text-align: center; font-size: 0.85rem;">More settings coming soon.</p>
                     </div>
                 </div>
             </section>
